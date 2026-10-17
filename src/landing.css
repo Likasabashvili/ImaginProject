@@ -749,7 +749,7 @@ app-root.dark-theme .site-shell {
   justify-content: center;
   border-radius: 50%;
   background: var(--ink);
-  color: #fff;
+  color: var(--paper);
   font-size: 6px;
   font-weight: 600;
   letter-spacing: 1px;
