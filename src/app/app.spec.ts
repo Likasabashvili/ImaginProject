@@ -3,6 +3,20 @@ import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: (media: string) => ({
+        matches: false,
+        media,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      }),
+    });
+
     await TestBed.configureTestingModule({
       imports: [App],
     }).compileComponents();
@@ -20,7 +34,10 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('From idea');
     expect(compiled.querySelector('.header-cta')?.getAttribute('href')).toBe(
-      '/downloads/imagin-windows.exe',
+      '/FigmaDesktopApp.zip',
+    );
+    expect(compiled.querySelector('.download-link')?.getAttribute('href')).toBe(
+      '/FigmaDesktopApp.zip',
     );
   });
 });
