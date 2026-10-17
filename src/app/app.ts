@@ -9,7 +9,10 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     const savedTheme = typeof window !== 'undefined' ? window.localStorage.getItem('imagin-theme') : null;
-    const prefersDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const prefersDark =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     this.isDarkTheme = savedTheme ? savedTheme === 'dark' : prefersDark;
     this.syncTheme();
