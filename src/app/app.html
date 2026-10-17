@@ -16,7 +16,7 @@
         type="button"
         [attr.aria-label]="isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'"
         [attr.aria-pressed]="isDarkTheme"
-        (click)="toggleTheme()"
+        (click)="toggleTheme($event)"
       >
         <span class="theme-icon" aria-hidden="true">{{ isDarkTheme ? '☀' : '☾' }}</span>
         <span>{{ isDarkTheme ? 'Light' : 'Dark' }}</span>
