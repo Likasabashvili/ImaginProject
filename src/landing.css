@@ -995,6 +995,124 @@ app-root.dark-theme .button-dark:hover {
   line-height: 1.5;
 }
 
+.presentation-card {
+  position: relative;
+  width: min(1440px, 100%);
+  min-height: 190px;
+  margin: 0 auto;
+  padding: 36px 7.1%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse at 84% 50%, rgba(194, 123, 18, 0.12), transparent 37%),
+    var(--paper-strong);
+}
+
+.presentation-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.presentation-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 15px;
+  color: var(--text-dim);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+}
+
+.presentation-spark {
+  color: #c27b12;
+  font-size: 14px;
+}
+
+.presentation-copy h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 400;
+  letter-spacing: -0.7px;
+}
+
+.presentation-copy > p:last-child {
+  margin: 10px 0 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.presentation-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.presentation-link {
+  position: relative;
+  z-index: 1;
+  min-height: 46px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  color: var(--paper);
+  background: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.presentation-link-secondary {
+  border-color: var(--line);
+  color: var(--ink);
+  background: transparent;
+}
+
+.presentation-link span {
+  font-size: 15px;
+  transition: transform 180ms ease;
+}
+
+.presentation-link:hover {
+  transform: translateY(-2px);
+  background: #30302d;
+}
+
+.presentation-link-secondary:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.presentation-link:hover span {
+  transform: translate(2px, -2px);
+}
+
+.presentation-index {
+  position: absolute;
+  right: 4%;
+  bottom: -62px;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 220px;
+  line-height: 1;
+  opacity: 0.035;
+  pointer-events: none;
+}
+
 .download-row {
   width: min(1440px, 100%);
   margin: 0 auto;
@@ -1069,6 +1187,7 @@ app-root.dark-theme .button-dark:hover {
   .site-footer,
   .hero,
   .bottom-strip,
+  .presentation-card,
   .download-row {
     padding-right: 5%;
     padding-left: 5%;
@@ -1277,6 +1396,30 @@ app-root.dark-theme .button-dark:hover {
     padding-top: 27px;
     padding-bottom: 27px;
     gap: 10px;
+  }
+
+  .presentation-card {
+    min-height: 0;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .presentation-actions {
+    width: 100%;
+  }
+
+  .presentation-link {
+    flex: 1 1 auto;
+    padding: 0 14px;
+  }
+
+  .presentation-index {
+    right: 0;
+    bottom: -33px;
+    font-size: 150px;
   }
 
   .download-meta {
