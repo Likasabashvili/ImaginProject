@@ -187,6 +187,138 @@ app-root.dark-theme .ambient-star-group span {
   z-index: 1;
 }
 
+.ambient-stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ambient-star-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  opacity: 0;
+  transform: translate3d(var(--star-x, -80px), var(--star-y, -80px), 0);
+  transition: opacity 800ms ease, transform 3600ms cubic-bezier(0.18, 0.64, 0.32, 1);
+}
+
+.ambient-star-group:first-child {
+  transition-duration: 800ms, 4800ms;
+}
+
+.ambient-star-group.is-visible {
+  opacity: 1;
+}
+
+.ambient-star-group-small {
+  scale: 0.78;
+}
+
+.ambient-star-group-smaller {
+  scale: 0.62;
+}
+
+.ambient-star-group span {
+  position: absolute;
+  color: #c27b12;
+  text-shadow: 0 0 9px rgba(210, 143, 31, 0.48);
+  animation: ambient-star-twinkle 4.8s ease-in-out infinite alternate;
+}
+
+app-root.dark-theme .ambient-star-group span {
+  color: #e9e6d8;
+  text-shadow: 0 0 9px rgba(233, 230, 216, 0.65);
+}
+
+.ambient-star-group span:nth-child(1) {
+  font-size: 15px;
+  transform: translate(10px, 5px);
+}
+
+.ambient-star-group span:nth-child(2) {
+  font-size: 10px;
+  animation-delay: 280ms;
+  transform: translate(-13px, 13px);
+}
+
+.ambient-star-group span:nth-child(3) {
+  font-size: 8px;
+  animation-delay: 560ms;
+  transform: translate(17px, -11px);
+}
+
+.ambient-star-group span:nth-child(4) {
+  font-size: 12px;
+  animation-delay: 1200ms;
+  transform: translate(-8px, -17px);
+}
+
+.ambient-star-group span:nth-child(5) {
+  font-size: 7px;
+  animation-delay: 400ms;
+  transform: translate(25px, 7px);
+}
+
+.ambient-star-group span:nth-child(6) {
+  font-size: 9px;
+  animation-delay: 1800ms;
+  transform: translate(-24px, -2px);
+}
+
+.ambient-star-group span:nth-child(7) {
+  font-size: 6px;
+  animation-delay: 1000ms;
+  transform: translate(5px, 25px);
+}
+
+.ambient-star-group span:nth-child(8) {
+  font-size: 11px;
+  animation-delay: 2200ms;
+  transform: translate(-2px, -27px);
+}
+
+.ambient-star-group span:nth-child(9) {
+  font-size: 8px;
+  animation-delay: 1500ms;
+  transform: translate(30px, -17px);
+}
+
+.ambient-star-group span:nth-child(10) {
+  font-size: 6px;
+  animation-delay: 2600ms;
+  transform: translate(-28px, 23px);
+}
+
+.ambient-star-group span:nth-child(11) {
+  font-size: 10px;
+  animation-delay: 700ms;
+  transform: translate(21px, 28px);
+}
+
+.ambient-star-group span:nth-child(12) {
+  font-size: 7px;
+  animation-delay: 3000ms;
+  transform: translate(-20px, -30px);
+}
+
+@keyframes ambient-star-twinkle {
+  from {
+    opacity: 0.45;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.site-shell > :not(.ambient-stars) {
+  position: relative;
+  z-index: 1;
+}
+
 app-root.dark-theme .site-shell {
   background:
     radial-gradient(ellipse at 71% 36%, rgba(147, 160, 173, 0.12), transparent 37%),
@@ -403,6 +535,14 @@ app-root.dark-theme .site-shell {
 .button-dark {
   color: var(--paper);
   background: var(--ink);
+}
+
+app-root:not(.dark-theme) .button-dark:hover {
+  background: #30302d;
+}
+
+app-root.dark-theme .button-dark:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
 

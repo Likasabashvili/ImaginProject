@@ -1,24 +1,26 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  ViewChildren,
+  inject
+} from '@angular/core';
 
 const THEME_STORAGE_KEY = 'imagin-theme';
-const THEME_FADE_CLASS = 'theme-fade';
-const THEME_FADE_MS = 500;
-const THEME_REVEAL_MS = 650;
-
-type ViewTransitionDocument = Document & {
-  startViewTransition?: (callback: () => void) => { ready: Promise<void> };
-};
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html'
 })
-export class App implements OnInit {
+export class App implements AfterViewInit, OnDestroy, OnInit {
   isDarkTheme = false;
 
   private readonly host: HTMLElement = inject(ElementRef).nativeElement;
-  private readonly cdr = inject(ChangeDetectorRef);
-  private fadeTimer?: ReturnType<typeof setTimeout>;
+  @ViewChildren('starGroup') private starGroups!: QueryList<ElementRef<HTMLDivElement>>;
+  private starDriftTimeouts: number[] = [];
 
   ngOnInit(): void {
     const savedTheme = typeof window !== 'undefined' ? window.localStorage.getItem(THEME_STORAGE_KEY) : null;
@@ -28,48 +30,17 @@ export class App implements OnInit {
     this.applyTheme();
   }
 
-  toggleTheme(event?: MouseEvent): void {
-    const nextIsDark = !this.isDarkTheme;
-    const { x, y } = this.originOf(event);
+  ngAfterViewInit(): void {
+    this.startStarDrift();
+  }
 
-    const update = () => {
-      this.isDarkTheme = nextIsDark;
-      // Flush bindings inside the transition callback so the new state is captured in the same frame.
-      this.cdr.detectChanges();
-      this.applyTheme();
-    };
+  ngOnDestroy(): void {
+    this.stopStarDrift();
+  }
 
-    if (this.prefersReducedMotion()) {
-      update();
-      return;
-    }
-
-    const doc = document as ViewTransitionDocument;
-
-    if (doc.startViewTransition) {
-      const transition = doc.startViewTransition(update);
-      const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-
-      transition.ready
-        .then(() => {
-          document.documentElement.animate(
-            {
-              clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`]
-            },
-            {
-              duration: THEME_REVEAL_MS,
-              easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-              pseudoElement: '::view-transition-new(root)'
-            }
-          );
-        })
-        .catch(() => {
-          // The transition was skipped; the theme is already applied.
-        });
-      return;
-    }
-
-    this.fadeTheme(update);
+  toggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
+    this.applyTheme();
   }
 
   private applyTheme(): void {
@@ -82,29 +53,86 @@ export class App implements OnInit {
     window.localStorage.setItem(THEME_STORAGE_KEY, this.isDarkTheme ? 'dark' : 'light');
   }
 
-  /** Fallback for browsers without View Transitions: transition colors across the page for a short window. */
-  private fadeTheme(update: () => void): void {
-    const root = document.documentElement;
-
-    root.classList.add(THEME_FADE_CLASS);
-    update();
-
-    clearTimeout(this.fadeTimer);
-    this.fadeTimer = setTimeout(() => root.classList.remove(THEME_FADE_CLASS), THEME_FADE_MS);
+  private startStarDrift(): void {
+    this.starGroups.forEach((group, index) => this.moveStarGroup(group, index));
   }
 
-  private originOf(event?: MouseEvent): { x: number; y: number } {
-    const target = event?.currentTarget as HTMLElement | null | undefined;
-
-    if (target?.getBoundingClientRect) {
-      const rect = target.getBoundingClientRect();
-      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  private moveStarGroup(group: ElementRef<HTMLDivElement>, groupIndex: number): void {
+    const position = this.findOpenStarPosition(groupIndex);
+    if (!position) {
+      this.starDriftTimeouts[groupIndex] = window.setTimeout(
+        () => this.moveStarGroup(group, groupIndex),
+        1500
+      );
+      return;
     }
 
-    return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const stars = group.nativeElement;
+    const previousX = Number.parseFloat(stars.style.getPropertyValue('--star-x'));
+    const previousY = Number.parseFloat(stars.style.getPropertyValue('--star-y'));
+    stars.style.setProperty('--star-x', `${position.x}px`);
+    stars.style.setProperty('--star-y', `${position.y}px`);
+    stars.classList.add('is-visible');
+    this.starDriftTimeouts[groupIndex] = window.setTimeout(
+      () => this.moveStarGroup(group, groupIndex),
+      groupIndex === 0 ? 5200 + Math.random() * 1800 : 3800 + Math.random() * 1800
+    );
   }
 
-  private prefersReducedMotion(): boolean {
-    return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  private findOpenStarPosition(groupIndex: number): { x: number; y: number } | null {
+    const margin = 46;
+    const blockers = Array.from(document.querySelectorAll<HTMLElement>(
+      'a, button, input, textarea, select, h1, h2, h3, p, strong, em, .hero-copy, .app-window, .floating-note, .art-sticker, .bottom-strip, .download-row, .site-header, .site-footer'
+    )).map((element) => element.getBoundingClientRect());
+    const currentGroup = this.starGroups.get(groupIndex)?.nativeElement;
+    const startX = currentGroup?.classList.contains('is-visible')
+      ? Number.parseFloat(currentGroup.style.getPropertyValue('--star-x'))
+      : Number.NaN;
+    const startY = currentGroup?.classList.contains('is-visible')
+      ? Number.parseFloat(currentGroup.style.getPropertyValue('--star-y'))
+      : Number.NaN;
+    const otherGroups = this.starGroups
+      .toArray()
+      .filter((_, index) => index !== groupIndex)
+      .map(({ nativeElement }) => ({
+        visible: nativeElement.classList.contains('is-visible'),
+        x: Number.parseFloat(nativeElement.style.getPropertyValue('--star-x')),
+        y: Number.parseFloat(nativeElement.style.getPropertyValue('--star-y'))
+      }))
+      .filter((other) => other.visible && Number.isFinite(other.x) && Number.isFinite(other.y));
+
+    for (let attempt = 0; attempt < 60; attempt += 1) {
+      const x = margin + Math.random() * Math.max(0, window.innerWidth - margin * 2);
+      const y = margin + Math.random() * Math.max(0, window.innerHeight - margin * 2);
+      const overlapsAnotherGroup = otherGroups.some(
+        (other) => Math.abs(x - other.x) < 100 && Math.abs(y - other.y) < 100
+      );
+      const pathSteps = Number.isFinite(startX) && Number.isFinite(startY)
+        ? 12
+        : 1;
+      const pathIsClear = Array.from({ length: pathSteps }, (_, step) => {
+        const progress = (step + 1) / pathSteps;
+        const pointX = Number.isFinite(startX) ? startX + (x - startX) * progress : x;
+        const pointY = Number.isFinite(startY) ? startY + (y - startY) * progress : y;
+        return !blockers.some(
+          (bounds) =>
+            pointX + margin > bounds.left &&
+            pointX - margin < bounds.right &&
+            pointY + margin > bounds.top &&
+            pointY - margin < bounds.bottom
+        );
+      }).every(Boolean);
+
+      if (!overlapsAnotherGroup && pathIsClear) {
+        return { x, y };
+      }
+    }
+
+    return null;
+  }
+
+  private stopStarDrift(): void {
+    this.starDriftTimeouts.forEach((timeout) => window.clearTimeout(timeout));
+    this.starDriftTimeouts = [];
   }
 }

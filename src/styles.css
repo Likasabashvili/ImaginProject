@@ -21,20 +21,6 @@ body[data-theme='light'] {
   background: #f5f4f0;
 }
 
-/* Fallback theme switch (no View Transitions): ease colors across the page briefly. */
-html.theme-fade,
-html.theme-fade *,
-html.theme-fade *::before,
-html.theme-fade *::after {
-  transition:
-    background-color 500ms ease,
-    color 500ms ease,
-    border-color 500ms ease,
-    fill 500ms ease,
-    stroke 500ms ease,
-    box-shadow 500ms ease !important;
-}
-
 /* Load-in: each block fades up in sequence. `backwards` fill keeps the element's own styles after it finishes. */
 @keyframes block-in {
   from {
@@ -56,13 +42,6 @@ html.theme-fade *::after {
   .reveal {
     animation: none;
   }
-}
-
-/* Circular reveal from the toggle: the new snapshot is animated by clip-path in app.ts. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
 }
 
 app-root {
