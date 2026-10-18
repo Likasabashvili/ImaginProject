@@ -68,8 +68,6 @@ export class App implements AfterViewInit, OnDestroy, OnInit {
     }
 
     const stars = group.nativeElement;
-    const previousX = Number.parseFloat(stars.style.getPropertyValue('--star-x'));
-    const previousY = Number.parseFloat(stars.style.getPropertyValue('--star-y'));
     stars.style.setProperty('--star-x', `${position.x}px`);
     stars.style.setProperty('--star-y', `${position.y}px`);
     stars.classList.add('is-visible');
