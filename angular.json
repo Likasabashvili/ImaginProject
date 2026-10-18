@@ -22,6 +22,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "FigmaDesktopApp.zip",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [

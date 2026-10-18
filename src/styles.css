@@ -10,6 +10,7 @@ body {
 
 body {
   min-height: 100vh;
+  transition: background-color 320ms ease;
 }
 
 body[data-theme='dark'] {

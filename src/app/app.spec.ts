@@ -28,7 +28,7 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the landing page and app download link', async () => {
+  it('should render both app download links', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
