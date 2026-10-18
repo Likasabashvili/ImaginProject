@@ -1,23 +1,5 @@
 <div class="site-shell">
-  <div class="ambient-stars" aria-hidden="true">
-    <div #starGroup class="ambient-star-group">
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-    </div>
-    <div #starGroup class="ambient-star-group ambient-star-group-small">
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-    </div>
-    <div #starGroup class="ambient-star-group ambient-star-group-smaller">
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
-    </div>
-  </div>
-
-  <header class="site-header">
+  <header class="site-header reveal" style="--reveal-delay: 0ms">
     <a class="brand" href="#" aria-label="Imagin home">
       <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
       <span>imagin</span>
@@ -34,14 +16,14 @@
         type="button"
         [attr.aria-label]="isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'"
         [attr.aria-pressed]="isDarkTheme"
-        (click)="toggleTheme()"
+        (click)="toggleTheme($event)"
       >
         <span class="theme-icon" aria-hidden="true">{{ isDarkTheme ? '☀' : '☾' }}</span>
         <span>{{ isDarkTheme ? 'Light' : 'Dark' }}</span>
       </button>
 
-      <a class="header-cta" href="FigmaDesktopApp.zip" download="FigmaDesktopApp.zip">
-        Get Figma Desktop
+      <a class="header-cta" href="/FigmaDesktopApp.zip" download="FigmaDesktopApp.zip">
+        Get the app
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9m-3.5-3.5L12.5 8 9 11.5" /></svg>
       </a>
     </div>
@@ -49,15 +31,15 @@
 
   <main>
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-copy">
+      <div class="hero-copy reveal" style="--reveal-delay: 120ms">
         <p class="eyebrow"><span class="eyebrow-dot"></span> YOUR DESIGN SIDEKICK</p>
         <h1 id="hero-title">From idea<br />to <span>interface.</span></h1>
         <p class="hero-description">
           Meet the Figma assistant made for solo developers. Turn the thing in your head into a design you can build.
         </p>
         <div class="hero-actions">
-          <a class="button button-dark" href="FigmaDesktopApp.zip" download="FigmaDesktopApp.zip">
-            Download Figma Desktop App
+          <a class="button button-dark" href="/FigmaDesktopApp.zip" download="FigmaDesktopApp.zip">
+            Download Imagin
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v8m-3-3 3 3 3-3M4.5 13v2.5h11V13" /></svg>
           </a>
           <span class="platform-note"><span class="platform-dot" aria-hidden="true"></span> Available for Windows only</span>
@@ -100,13 +82,22 @@
             >
               <span>LG</span>
             </a>
+            <a
+              class="avatar-link"
+              href="https://www.linkedin.com/in/ivan-yakushchenko-4aa358213"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open Ivan Yakushchenko on LinkedIn"
+            >
+              <span>IY</span>
+            </a>
             <span>+</span>
           </div>
           <p>Made for the ones<br /><strong>building it all themselves.</strong></p>
         </div>
       </div>
 
-      <div class="hero-art" aria-label="Preview of the Imagin design assistant">
+      <div class="hero-art reveal" style="--reveal-delay: 240ms" aria-label="Preview of the Imagin design assistant">
         <div class="art-orbit orbit-one"></div>
         <div class="art-orbit orbit-two"></div>
         <div class="art-sticker"><span>THINK</span><span>→</span><span>MAKE</span></div>
@@ -163,20 +154,22 @@
     </section>
 
     <section class="bottom-strip" id="how-it-works">
-      <div class="strip-intro"><span>01 / 03</span><p>Good ideas deserve<br />to get out of your head.</p></div>
-      <div class="strip-item"><span class="strip-number">01</span><div><strong>Say what you mean</strong><p>Describe your idea in your own words.</p></div></div>
-      <div class="strip-item"><span class="strip-number">02</span><div><strong>Shape it together</strong><p>Explore a direction with your AI design partner.</p></div></div>
-      <div class="strip-item"><span class="strip-number">03</span><div><strong>Make it yours</strong><p>Take your next step, right in Figma.</p></div></div>
+      <div class="strip-intro reveal" style="--reveal-delay: 360ms"><span>01 / 03</span><p>Good ideas deserve<br />to get out of your head.</p></div>
+      <div class="strip-item reveal" style="--reveal-delay: 440ms"><span class="strip-number">01</span><div><strong>Say what you mean</strong><p>Describe your idea in your own words.</p></div></div>
+      <div class="strip-item reveal" style="--reveal-delay: 520ms"><span class="strip-number">02</span><div><strong>Shape it together</strong><p>Explore a direction with your AI design partner.</p></div></div>
+      <div class="strip-item reveal" style="--reveal-delay: 600ms"><span class="strip-number">03</span><div><strong>Make it yours</strong><p>Take your next step, right in Figma.</p></div></div>
     </section>
 
-    <section class="download-row" id="download">
+    <section class="download-row reveal" style="--reveal-delay: 680ms" id="download">
       <p><span class="download-indicator"></span> READY WHEN YOU ARE</p>
-
+      <a class="download-link" href="/FigmaDesktopApp.zip" download="FigmaDesktopApp.zip">
+        Download for Windows <span>↗</span>
+      </a>
       <span class="download-meta">Windows &nbsp;·&nbsp; Free to get started</span>
     </section>
   </main>
 
-  <footer class="site-footer">
+  <footer class="site-footer reveal" style="--reveal-delay: 760ms">
     <a class="brand footer-brand" href="#" aria-label="Imagin home">
       <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
       <span>imagin</span>

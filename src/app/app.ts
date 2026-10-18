@@ -1,120 +1,110 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  HostBinding,
-  OnDestroy,
-  OnInit,
-  QueryList,
-  ViewChildren
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, inject } from '@angular/core';
+
+const THEME_STORAGE_KEY = 'imagin-theme';
+const THEME_FADE_CLASS = 'theme-fade';
+const THEME_FADE_MS = 500;
+const THEME_REVEAL_MS = 650;
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void) => { ready: Promise<void> };
+};
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html'
 })
-export class App implements AfterViewInit, OnDestroy, OnInit {
-  @HostBinding('class.dark-theme') isDarkTheme = false;
-  @ViewChildren('starGroup') private starGroups!: QueryList<ElementRef<HTMLDivElement>>;
-  private starDriftTimeouts: number[] = [];
+export class App implements OnInit {
+  isDarkTheme = false;
+
+  private readonly host: HTMLElement = inject(ElementRef).nativeElement;
+  private readonly cdr = inject(ChangeDetectorRef);
+  private fadeTimer?: ReturnType<typeof setTimeout>;
 
   ngOnInit(): void {
-    const savedTheme = typeof window !== 'undefined' ? window.localStorage.getItem('imagin-theme') : null;
-    const prefersDark =
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = typeof window !== 'undefined' ? window.localStorage.getItem(THEME_STORAGE_KEY) : null;
+    const prefersDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     this.isDarkTheme = savedTheme ? savedTheme === 'dark' : prefersDark;
-    this.syncTheme();
+    this.applyTheme();
   }
 
-  ngAfterViewInit(): void {
-    this.startStarDrift();
-  }
+  toggleTheme(event?: MouseEvent): void {
+    const nextIsDark = !this.isDarkTheme;
+    const { x, y } = this.originOf(event);
 
-  ngOnDestroy(): void {
-    this.stopStarDrift();
-  }
+    const update = () => {
+      this.isDarkTheme = nextIsDark;
+      // Flush bindings inside the transition callback so the new state is captured in the same frame.
+      this.cdr.detectChanges();
+      this.applyTheme();
+    };
 
-  toggleTheme(): void {
-    this.isDarkTheme = !this.isDarkTheme;
-    this.syncTheme();
-  }
-
-  private startStarDrift(): void {
-    this.starGroups.forEach((group, index) => this.showStarsAtRandomPosition(group, index));
-  }
-
-  private showStarsAtRandomPosition(group: ElementRef<HTMLDivElement>, index: number): void {
-    const position = this.findOpenStarPosition(index);
-    if (!position) {
-      this.starDriftTimeouts[index] = window.setTimeout(
-        () => this.showStarsAtRandomPosition(group, index),
-        1500
-      );
+    if (this.prefersReducedMotion()) {
+      update();
       return;
     }
 
-    group.nativeElement.style.setProperty('--star-x', `${position.x}px`);
-    group.nativeElement.style.setProperty('--star-y', `${position.y}px`);
-    group.nativeElement.classList.add('is-visible');
-    this.starDriftTimeouts[index] = window.setTimeout(
-      () => this.showStarsAtRandomPosition(group, index),
-      index === 0 ? 5200 + Math.random() * 1800 : 3800 + Math.random() * 1800
-    );
-  }
+    const doc = document as ViewTransitionDocument;
 
-  private findOpenStarPosition(groupIndex: number): { x: number; y: number } | null {
-    const margin = 46;
-    const blockers = document.querySelectorAll<HTMLElement>(
-      'a, button, input, textarea, select, h1, h2, h3, p, strong, em, .app-window, .floating-note, .art-sticker, .bottom-strip, .download-row, .site-header, .site-footer'
-    );
-    const otherGroups = this.starGroups
-      .toArray()
-      .filter((_, index) => index !== groupIndex)
-      .map(({ nativeElement }) => ({
-        visible: nativeElement.classList.contains('is-visible'),
-        x: Number.parseFloat(nativeElement.style.getPropertyValue('--star-x')),
-        y: Number.parseFloat(nativeElement.style.getPropertyValue('--star-y'))
-      }))
-      .filter((group) => group.visible && Number.isFinite(group.x) && Number.isFinite(group.y));
+    if (doc.startViewTransition) {
+      const transition = doc.startViewTransition(update);
+      const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
 
-    for (let attempt = 0; attempt < 60; attempt += 1) {
-      const x = margin + Math.random() * Math.max(0, window.innerWidth - margin * 2);
-      const y = margin + Math.random() * Math.max(0, window.innerHeight - margin * 2);
-      const overlapsAnotherGroup = otherGroups.some(
-        (group) => Math.abs(x - group.x) < 100 && Math.abs(y - group.y) < 100
-      );
-      const overlapsContent = Array.from(blockers).some((element) => {
-        const bounds = element.getBoundingClientRect();
-        return (
-          x + margin > bounds.left &&
-          x - margin < bounds.right &&
-          y + margin > bounds.top &&
-          y - margin < bounds.bottom
-        );
-      });
-
-      if (!overlapsContent && !overlapsAnotherGroup) {
-        return { x, y };
-      }
+      transition.ready
+        .then(() => {
+          document.documentElement.animate(
+            {
+              clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`]
+            },
+            {
+              duration: THEME_REVEAL_MS,
+              easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+              pseudoElement: '::view-transition-new(root)'
+            }
+          );
+        })
+        .catch(() => {
+          // The transition was skipped; the theme is already applied.
+        });
+      return;
     }
 
-    return null;
+    this.fadeTheme(update);
   }
 
-  private stopStarDrift(): void {
-    this.starDriftTimeouts.forEach((timeout) => window.clearTimeout(timeout));
-    this.starDriftTimeouts = [];
-  }
-
-  private syncTheme(): void {
+  private applyTheme(): void {
     if (typeof document === 'undefined') {
       return;
     }
 
+    this.host.classList.toggle('dark-theme', this.isDarkTheme);
     document.body.setAttribute('data-theme', this.isDarkTheme ? 'dark' : 'light');
-    window.localStorage.setItem('imagin-theme', this.isDarkTheme ? 'dark' : 'light');
+    window.localStorage.setItem(THEME_STORAGE_KEY, this.isDarkTheme ? 'dark' : 'light');
+  }
+
+  /** Fallback for browsers without View Transitions: transition colors across the page for a short window. */
+  private fadeTheme(update: () => void): void {
+    const root = document.documentElement;
+
+    root.classList.add(THEME_FADE_CLASS);
+    update();
+
+    clearTimeout(this.fadeTimer);
+    this.fadeTimer = setTimeout(() => root.classList.remove(THEME_FADE_CLASS), THEME_FADE_MS);
+  }
+
+  private originOf(event?: MouseEvent): { x: number; y: number } {
+    const target = event?.currentTarget as HTMLElement | null | undefined;
+
+    if (target?.getBoundingClientRect) {
+      const rect = target.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }
+
+    return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  }
+
+  private prefersReducedMotion(): boolean {
+    return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 }

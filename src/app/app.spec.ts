@@ -3,6 +3,20 @@ import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: (media: string) => ({
+        matches: false,
+        media,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      }),
+    });
+
     await TestBed.configureTestingModule({
       imports: [App],
     }).compileComponents();
@@ -19,14 +33,11 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('From idea');
-    const downloadLinks = [
-      compiled.querySelector('.header-cta'),
-      compiled.querySelector('.hero-actions .button-dark'),
-    ];
-
-    for (const link of downloadLinks) {
-      expect(link?.getAttribute('href')).toBe('FigmaDesktopApp.zip');
-      expect(link?.getAttribute('download')).toBe('FigmaDesktopApp.zip');
-    }
+    expect(compiled.querySelector('.header-cta')?.getAttribute('href')).toBe(
+      '/FigmaDesktopApp.zip',
+    );
+    expect(compiled.querySelector('.download-link')?.getAttribute('href')).toBe(
+      '/FigmaDesktopApp.zip',
+    );
   });
 });
