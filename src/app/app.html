@@ -1,4 +1,22 @@
 <div class="site-shell">
+  <div class="ambient-stars" aria-hidden="true">
+    <div #starGroup class="ambient-star-group">
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+    </div>
+    <div #starGroup class="ambient-star-group ambient-star-group-small">
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+    </div>
+    <div #starGroup class="ambient-star-group ambient-star-group-smaller">
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+    </div>
+  </div>
+
   <header class="site-header reveal" style="--reveal-delay: 0ms">
     <a class="brand" href="#" aria-label="Imagin home">
       <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
@@ -16,7 +34,7 @@
         type="button"
         [attr.aria-label]="isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'"
         [attr.aria-pressed]="isDarkTheme"
-        (click)="toggleTheme($event)"
+        (click)="toggleTheme()"
       >
         <span class="theme-icon" aria-hidden="true">{{ isDarkTheme ? '☀' : '☾' }}</span>
         <span>{{ isDarkTheme ? 'Light' : 'Dark' }}</span>
@@ -82,15 +100,7 @@
             >
               <span>LG</span>
             </a>
-            <a
-              class="avatar-link"
-              href="https://www.linkedin.com/in/ivan-yakushchenko-4aa358213"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open Ivan Yakushchenko on LinkedIn"
-            >
-              <span>IY</span>
-            </a>
+        
             <span>+</span>
           </div>
           <p>Made for the ones<br /><strong>building it all themselves.</strong></p>

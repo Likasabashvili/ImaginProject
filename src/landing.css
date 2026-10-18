@@ -405,6 +405,14 @@ app-root.dark-theme .site-shell {
   background: var(--ink);
 }
 
+app-root:not(.dark-theme) .button-dark:hover {
+  background: #30302d;
+}
+
+app-root.dark-theme .button-dark:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
 
 .platform-note {
   color: var(--text-dim);
